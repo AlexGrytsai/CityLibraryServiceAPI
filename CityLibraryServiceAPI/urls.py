@@ -14,32 +14,37 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib.auth.views import LogoutView
+
 # from django.contrib import admin
 from django.urls import path
 from debug_toolbar.toolbar import debug_toolbar_urls
-from rest_framework_simplejwt.views import TokenObtainPairView, \
-    TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 urlpatterns = [
-                  path(
-                      "api/v1/users/token/",
-                      TokenObtainPairView.as_view(),
-                      name="token_obtain_pair",
-                  ),
-                  path(
-                      "api/v1/users/token/refresh/",
-                      TokenRefreshView.as_view(),
-                      name="token_refresh",
-                  ),
-                  path(
-                      "api/v1/users/token/verify/",
-                      TokenVerifyView.as_view(),
-                      name="token_verify",
-                  ),
-                  path(
-                      "api/v1/users/token/logout/",
-                      LogoutView.as_view(),
-                      name="token_logout",
-                  ),
+    path(
+        "api/v1/users/token/",
+        TokenObtainPairView.as_view(),
+        name="token_obtain_pair",
+    ),
+    path(
+        "api/v1/users/token/refresh/",
+        TokenRefreshView.as_view(),
+        name="token_refresh",
+    ),
+    path(
+        "api/v1/users/token/verify/",
+        TokenVerifyView.as_view(),
+        name="token_verify",
+    ),
+    path(
+        "api/v1/users/token/logout/",
+        LogoutView.as_view(),
+        name="token_logout",
+    ),
 ] + debug_toolbar_urls()
