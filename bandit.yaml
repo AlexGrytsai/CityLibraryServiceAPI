@@ -1,0 +1,9 @@
+# FILE: bandit.yaml
+exclude_dirs: [
+  '.\books\tests\',
+  '.\books\migrations\',
+  '.\users\tests\',
+  '.\users\migrations\',
+  '.\.venv\Lib\',
+  '.\security_checking.py',
+]
