@@ -16,6 +16,7 @@ psycopg==3.2.1
 psycopg-binary==3.2.1
 pycparser==2.22
 PyJWT==2.9.0
+python-dotenv==1.0.1
 PyYAML==6.0.2
 referencing==0.35.1
 rpds-py==0.20.0
