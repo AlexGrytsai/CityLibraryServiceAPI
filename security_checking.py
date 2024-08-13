@@ -33,5 +33,27 @@ def run_bandit() -> None:
         print(f"Error during Bandit scan:\n{e.stderr}")
 
 
+def run_safety_check() -> None:
+    # safety scan --output html --save-html output.html
+    command = [
+        "safety",
+        "scan",
+        "--output",
+        "html",
+        "--save-html",
+        "output.html",
+    ]
+
+    print("Running safety scan...")
+    with open("report_safety.html", "w") as f:
+        subprocess.run(command, stdout=f, stderr=subprocess.STDOUT)
+
+    print(
+        "Safety scan completed successfully. "
+        "Report saved to 'report_safety.html'."
+    )
+
+
 if __name__ == "__main__":
     run_bandit()
+    run_safety_check()
