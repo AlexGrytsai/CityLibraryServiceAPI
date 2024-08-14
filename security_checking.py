@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logger = logging.getLogger("django")
+logger = logging.getLogger("security_checking")
 
 os.environ.setdefault(
     "DJANGO_SETTINGS_MODULE",
