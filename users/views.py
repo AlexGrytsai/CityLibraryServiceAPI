@@ -6,8 +6,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.serializers import Serializer
 
 from users.models import User
-from users.serializers import UserCreateSerializer, UserManageSerializer, \
-    UserUpdateSerializer
+from users.serializers import (
+    UserCreateSerializer,
+    UserManageSerializer,
+    UserUpdateSerializer,
+    UserPasswordUpdateSerializer,
+)
 
 
 class UserCreateView(generics.CreateAPIView):
@@ -48,3 +52,18 @@ class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return UserManageSerializer
         return UserUpdateSerializer
+
+
+class UserPasswordUpdateView(generics.UpdateAPIView):
+    """
+    A class-based view for updating a user's password.
+
+    This view handles PUT requests for updating a user's password.
+    It requires the user to be authenticated.
+    """
+
+    serializer_class = UserPasswordUpdateSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_object(self) -> User:
+        return self.request.user
