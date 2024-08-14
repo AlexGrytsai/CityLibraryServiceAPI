@@ -10,8 +10,7 @@ load_dotenv()
 logger = logging.getLogger("security_checking")
 
 os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE",
-    "CityLibraryServiceAPI.settings"
+    "DJANGO_SETTINGS_MODULE", "CityLibraryServiceAPI.settings"
 )
 execute_from_command_line(["manage.py", "check"])
 
@@ -54,7 +53,8 @@ def run_safety_check() -> None:
     api_key = os.environ.get("SAFETY_API_KEY")
     command = [
         "safety",
-        "--stage", "production",
+        "--stage",
+        "production",
         "scan",
         f"--key={api_key}",
         "--output",

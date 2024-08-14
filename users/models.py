@@ -89,6 +89,6 @@ class User(AbstractUser):
                 condition=Q(username__isnull=False),
                 name="unique_username",
                 violation_error_message="A user with that username already "
-                                        "exists.",
+                "exists.",
             ),
         ]
