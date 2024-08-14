@@ -11,3 +11,5 @@ urlpatterns = [
         name="update-password",
     ),
 ]
+
+app_name = "users"
