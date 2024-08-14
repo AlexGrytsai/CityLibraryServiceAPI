@@ -85,3 +85,32 @@ class UserUpdateSerializer(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         fields = UserCreateSerializer.Meta.fields.copy()
         fields.remove("password")
+
+
+class UserPasswordUpdateSerializer(serializers.ModelSerializer):
+    """
+    A serializer for updating a user's password.
+
+    This serializer provides a way to validate and update a user's password.
+    It uses the `validate_password` validator to ensure the password meets the
+    required complexity rules.
+    """
+
+    class Meta:
+        model = User
+        fields = ["password"]
+
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+                "min_length": 8,
+                "max_length": 128,
+                "validators": [validate_password],
+                "style": {"input_type": "password", "placeholder": "Password"},
+            },
+        }
+
+    def update(self, instance: User, validated_data: dict) -> User:
+        instance.set_password(validated_data["password"])
+        instance.save()
+        return instance
