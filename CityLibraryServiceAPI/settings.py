@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import logging
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -194,13 +195,11 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+        "custom": {
+            "()": "CityLibraryServiceAPI.log_formatters.CustomFormatter",
+            "format": "{levelname} [{asctime}] ({folder_name}/{filename}) {message}",
             "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
     "handlers": {
@@ -208,12 +207,27 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.FileHandler",
             "filename": "debug.log",
-            "formatter": "verbose",
+            "formatter": "custom",
+        },
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "custom",
+        },
+        "security_console": {
+            "level": "WARNING",
+            "class": "logging.StreamHandler",
+            "formatter": "custom",
         },
     },
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "security_checking": {
+            "handlers": ["security_console", "file"],
             "level": "INFO",
             "propagate": True,
         },
