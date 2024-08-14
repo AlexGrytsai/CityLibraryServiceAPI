@@ -58,7 +58,8 @@ class UserManageSerializer(serializers.ModelSerializer):
     A serializer for managing user instances.
 
     This serializer provides a way to serialize and deserialize user data,
-    including their ID, email, username, staff status, first name, and last name.
+    including their ID, email, username, staff status, first name,
+    and last name.
     """
 
     class Meta:
@@ -78,8 +79,10 @@ class UserUpdateSerializer(UserCreateSerializer):
     """
     A serializer for updating existing user instances.
 
-    This serializer inherits from UserCreateSerializer and removes the 'password' field,
-    as passwords should not be updated directly. Instead, use a separate password update endpoint.
+    This serializer inherits from UserCreateSerializer and removes
+    the 'password' field,
+    as passwords should not be updated directly. Instead, use
+    a separate password update endpoint.
     """
 
     class Meta(UserCreateSerializer.Meta):
