@@ -1,7 +1,9 @@
 from __future__ import annotations
+
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext as _
 
 
@@ -73,3 +75,20 @@ class User(AbstractUser):
         if self.username:
             return self.username
         return self.email
+
+    class Meta:
+        ordering = ["email"]
+        indexes = [
+            models.Index(fields=["username"]),
+            models.Index(fields=["last_name", "first_name"]),
+            models.Index(fields=["email"]),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["username"],
+                condition=Q(username__isnull=False),
+                name="unique_username",
+                violation_error_message="A user with that username already "
+                                        "exists.",
+            ),
+        ]
