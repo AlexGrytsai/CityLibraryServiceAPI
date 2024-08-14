@@ -1,5 +1,9 @@
+from __future__ import annotations
 from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext as _
+
 
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
@@ -37,3 +41,35 @@ class UserManager(BaseUserManager):
             raise ValueError("Superuser must have is_superuser=True.")
 
         return self._create_user(email, password, **extra_fields)
+
+
+class User(AbstractUser):
+    """
+    User model that uses email as the username.
+    """
+
+    username = models.CharField(
+        _("username"), max_length=150, blank=True, null=True
+    )
+
+    # Add an email field with a unique constraint.
+    email = models.EmailField(_("email address"), unique=True)
+
+    # Set the USERNAME_FIELD to email.
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = []
+
+    # Use the custom UserManager.
+    objects = UserManager()
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        """String representation of the User model."""
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        if self.username:
+            return self.username
+        return self.email
