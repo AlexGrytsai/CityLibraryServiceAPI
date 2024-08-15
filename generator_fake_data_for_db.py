@@ -29,7 +29,7 @@ def generate_fake_user_data() -> list:
 
 def generate_fake_books_data_for_db() -> list:
     books_data = []
-    for i in range(10):
+    for i in range(1100):
         pk = i + 30
         title = fake.unique.sentence(nb_words=4)
         author = fake.name()
