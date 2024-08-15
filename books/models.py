@@ -43,6 +43,17 @@ class Book(models.Model):
 
     class Meta:
         ordering = ["title", "author"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["title", "author"], name="unique_book"
+            ),
+            models.CheckConstraint(
+                check=models.Q(inventory__gte=0), name="inventory_check"
+            ),
+            models.CheckConstraint(
+                check=models.Q(daily_fee__gte=0), name="daily_fee_check"
+            ),
+        ]
 
     def __str__(self):
         return f"{self.title} by {self.author}"
