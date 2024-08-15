@@ -357,3 +357,6 @@ pyrightconfig.json
 *.rdb
 
 # End of https://www.toptal.com/developers/gitignore/api/python,django,pycharm+all,redis
+
+bandit_report.html
+report_safety.html
