@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAdminUser, AllowAny
 from books.models import Book
 from books.serializers import BookSerializer, BookListSerializer
 
+
 @extend_schema_view(
     list=extend_schema(
         summary="List all books",
@@ -29,7 +30,7 @@ from books.serializers import BookSerializer, BookListSerializer
         summary="Update a book",
         tags=["Books"],
         description="Update the details of an existing book. "
-                    "Only accessible to admins.",
+        "Only accessible to admins.",
         request=BookSerializer,
         responses={200: BookSerializer},
     ),
@@ -37,7 +38,7 @@ from books.serializers import BookSerializer, BookListSerializer
         summary="Partially update a book",
         tags=["Books"],
         description="Partially update the details of an existing book. "
-                    "Only accessible to admins.",
+        "Only accessible to admins.",
         request=BookSerializer,
         responses={200: BookSerializer},
     ),
