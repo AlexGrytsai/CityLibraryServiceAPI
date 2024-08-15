@@ -48,4 +48,5 @@ urlpatterns = [
         name="token_logout",
     ),
     path("api/v1/users/", include("users.urls", namespace="users")),
+    path("api/v1/", include("books.urls", namespace="books")),
 ] + debug_toolbar_urls()
