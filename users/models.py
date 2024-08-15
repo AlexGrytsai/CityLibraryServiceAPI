@@ -50,10 +50,6 @@ class User(AbstractUser):
     User model that uses email as the username.
     """
 
-    username = models.CharField(
-        _("username"), max_length=150, blank=True, null=True
-    )
-
     # Add an email field with a unique constraint.
     email = models.EmailField(_("email address"), unique=True)
 
@@ -72,23 +68,11 @@ class User(AbstractUser):
         """String representation of the User model."""
         if self.first_name and self.last_name:
             return f"{self.first_name} {self.last_name}"
-        if self.username:
-            return self.username
         return self.email
 
     class Meta:
         ordering = ["email"]
         indexes = [
-            models.Index(fields=["username"]),
             models.Index(fields=["last_name", "first_name"]),
             models.Index(fields=["email"]),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["username"],
-                condition=Q(username__isnull=False),
-                name="unique_username",
-                violation_error_message="A user with that username already "
-                "exists.",
-            ),
         ]
