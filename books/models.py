@@ -41,5 +41,8 @@ class Book(models.Model):
         validators=[MinValueValidator(0.0)],
     )
 
+    class Meta:
+        ordering = ["title", "author"]
+
     def __str__(self):
         return f"{self.title} by {self.author}"
