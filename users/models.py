@@ -49,6 +49,7 @@ class User(AbstractUser):
     """
     User model that uses email as the username.
     """
+    username = None
 
     # Add an email field with a unique constraint.
     email = models.EmailField(_("email address"), unique=True)
