@@ -20,7 +20,6 @@ class BorrowingSerializer(serializers.ModelSerializer):
         fields = [
             "borrow_date",
             "expected_return_date",
-            "actual_return_date",
             "book",
             "user",
         ]
