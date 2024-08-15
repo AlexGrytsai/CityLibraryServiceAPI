@@ -3,7 +3,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAdminUser, AllowAny
 
 from books.models import Book
-from books.serializers import BookSerializer, BookListSerializer
+from books.serializers import (
+    BookSerializer,
+    BookListSerializer,
+    BookDetailSerializer,
+)
 
 
 @extend_schema_view(
@@ -64,6 +68,8 @@ class BookViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return BookListSerializer
+        if self.action == "retrieve":
+            return BookDetailSerializer
         return BookSerializer
 
     def get_queryset(self):
