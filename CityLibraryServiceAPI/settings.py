@@ -14,6 +14,7 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+from log import redis_logging
 
 from dotenv import load_dotenv
 
@@ -197,7 +198,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "custom": {
-            "()": "CityLibraryServiceAPI.log_formatters.CustomFormatter",
+            "()": "log.log_formatters.CustomFormatter",
             "format": "{levelname} [{asctime}] ({folder_name}/{filename}) {message}",
             "style": "{",
             "datefmt": "%Y-%m-%d %H:%M:%S",
@@ -206,8 +207,8 @@ LOGGING = {
     "handlers": {
         "redis": {
             "level": "DEBUG",
-            "class": "CityLibraryServiceAPI.CityLibraryServiceAPI.redis_logging.RedisLogHandler",
-            "formatter": "verbose",
+            "class": "log.redis_logging.RedisLogHandler",
+            "formatter": "custom",
         },
         "file": {
             "level": "INFO",
@@ -228,7 +229,7 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file", "console"],
+            "handlers": ["file", "console", "redis"],
             "level": "INFO",
             "propagate": True,
         },
