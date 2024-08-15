@@ -204,6 +204,11 @@ LOGGING = {
         },
     },
     "handlers": {
+        "redis": {
+            "level": "DEBUG",
+            "class": "CityLibraryServiceAPI.CityLibraryServiceAPI.redis_logging.RedisLogHandler",
+            "formatter": "verbose",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
