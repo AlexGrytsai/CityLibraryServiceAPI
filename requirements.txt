@@ -18,7 +18,9 @@ djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 dparse==0.6.4b0
 drf-spectacular==0.27.2
+Faker==27.0.0
 filelock==3.12.4
+hiredis==3.0.0
 idna==3.7
 inflection==0.5.1
 Jinja2==3.1.4
@@ -28,6 +30,7 @@ markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 marshmallow==3.21.3
 mdurl==0.1.2
+more-itertools==10.4.0
 mypy-extensions==1.0.0
 packaging==24.1
 pathspec==0.12.1
@@ -42,8 +45,12 @@ pydantic==2.8.2
 pydantic_core==2.20.1
 Pygments==2.18.0
 PyJWT==2.9.0
+python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
+python-ulid==1.1.0
 PyYAML==6.0.2
+redis==5.0.8
+redis-om==0.3.2
 referencing==0.35.1
 requests==2.32.3
 rich==13.7.1
@@ -54,9 +61,14 @@ safety==3.2.5
 safety-schemas==0.0.3
 setuptools==72.1.0
 shellingham==1.5.4
+six==1.16.0
 sqlparse==0.5.1
 stevedore==5.2.0
 typer==0.12.3
+types-cffi==1.16.0.20240331
+types-pyOpenSSL==24.1.0.20240722
+types-redis==4.6.0.20240806
+types-setuptools==71.1.0.20240813
 typing_extensions==4.12.2
 tzdata==2024.1
 uritemplate==4.1.1
