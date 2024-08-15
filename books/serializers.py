@@ -6,3 +6,9 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ["title", "author", "inventory", "daily_fee"]
+
+
+class BookListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ["title", "author", "daily_fee"]
