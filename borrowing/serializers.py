@@ -42,3 +42,23 @@ class BorrowingListSerializer(serializers.ModelSerializer):
 
     def get_book(self, obj: Borrowing) -> str:
         return obj.book.title
+
+
+class BookDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ["id", "title", "author", "daily_fee"]
+
+
+class BorrowingDetailSerializer(serializers.ModelSerializer):
+    book = BookDetailSerializer()
+
+    class Meta:
+        model = Borrowing
+        fields = [
+            "id",
+            "book",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+        ]
