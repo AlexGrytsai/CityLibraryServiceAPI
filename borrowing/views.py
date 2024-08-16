@@ -1,18 +1,26 @@
 from typing import Type
 
 from rest_framework import viewsets, mixins, serializers
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.serializers import Serializer
 
+from borrowing.models import Borrowing
 from borrowing.serializers import BorrowingSerializer
 
 
-class BorrowingView(mixins.CreateModelMixin, viewsets.GenericViewSet):
-    permission_classes = (IsAdminUser,)
+class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        current_user = self.request.user
+        if current_user.is_staff:
+            return Borrowing.objects.all()
+        return Borrowing.objects.filter(user=current_user)
 
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "create":
             return BorrowingSerializer
+        return BorrowingSerializer
 
     def perform_create(self, serializer) -> None:
         book = serializer.validated_data["book"]
@@ -24,3 +32,5 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.GenericViewSet):
 
         book.inventory -= 1
         book.save()
+
+        serializer.save(user=self.request.user)
