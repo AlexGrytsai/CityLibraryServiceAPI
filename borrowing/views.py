@@ -10,12 +10,13 @@ from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer
 
 class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
+    queryset = Borrowing.objects.all().select_related("user", "book")
 
     def get_queryset(self):
         current_user = self.request.user
         if current_user.is_staff:
-            return Borrowing.objects.all()
-        return Borrowing.objects.filter(user=current_user)
+            return super(BorrowingView, self).get_queryset()
+        return super().get_queryset().filter(user=current_user)
 
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "create":
