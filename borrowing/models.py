@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import get_object_or_404
 
 from users.models import User
 from books.models import Book
@@ -32,6 +34,16 @@ class Borrowing(models.Model):
         db_comment="User who borrowed the book",
         help_text="User",
     )
+
+    def save(self, *args, **kwargs) -> None:
+        if self.pk is not None:
+            old_instance = get_object_or_404(Borrowing, pk=self.pk)
+            if (old_instance.actual_return_date and
+                old_instance.actual_return_date != self.actual_return_date):
+                raise ValidationError(
+                    "Cannot change actual_return_date once it is set."
+                )
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-expected_return_date"]
