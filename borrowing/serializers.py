@@ -21,7 +21,24 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "book",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict) -> Borrowing:
         logger.info(f"User borrowed book '{validated_data['book']}'")
 
         return Borrowing.objects.create(**validated_data)
+
+
+class BorrowingListSerializer(serializers.ModelSerializer):
+    book = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Borrowing
+        fields = [
+            "id",
+            "book",
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+        ]
+
+    def get_book(self, obj: Borrowing) -> str:
+        return obj.book.title
