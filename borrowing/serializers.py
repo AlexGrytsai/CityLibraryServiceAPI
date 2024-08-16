@@ -5,9 +5,10 @@ from rest_framework import serializers
 
 from books.models import Book
 from borrowing.models import Borrowing
-from users.models import User
 
-logger = logging.getLogger("django")
+logger = logging.getLogger("my_debug")
+
+
 class BorrowingSerializer(serializers.ModelSerializer):
     book = serializers.PrimaryKeyRelatedField(
         queryset=Book.objects.all().filter(Q(inventory__gt=0))
@@ -16,19 +17,11 @@ class BorrowingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
         fields = [
-            "borrow_date",
             "expected_return_date",
             "book",
         ]
 
-    def validate(self, data):
-        if data["expected_return_date"] < data["borrow_date"]:
-            user = self.context.get("request").user
-            logger.error(
-                f"The expected return date must be after the borrow date. "
-                f"User: {user}"
-            )
-            raise serializers.ValidationError(
-                "The expected return date must be after the borrow date"
-            )
-        return data
+    def create(self, validated_data):
+        logger.info(f"User borrowed book '{validated_data['book']}'")
+
+        return Borrowing.objects.create(**validated_data)
