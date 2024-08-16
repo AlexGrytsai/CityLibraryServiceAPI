@@ -203,6 +203,11 @@ LOGGING = {
             "style": "{",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
+        "info": {
+            "format": "{levelname} [{asctime}] ({filename}) {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
     },
     "handlers": {
         "file": {
@@ -221,6 +226,12 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "custom",
         },
+        "my_debug": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "my_debug.log",
+            "formatter": "info",
+        }
     },
     "loggers": {
         "django": {
@@ -231,6 +242,11 @@ LOGGING = {
         "security_checking": {
             "handlers": ["security_console", "file"],
             "level": "INFO",
+            "propagate": True,
+        },
+        "my_debug": {
+            "handlers": ["my_debug"],
+            "level": "DEBUG",
             "propagate": True,
         },
     },
