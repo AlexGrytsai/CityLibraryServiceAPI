@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.serializers import Serializer
 
 from borrowing.models import Borrowing
-from borrowing.serializers import BorrowingSerializer
+from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer
 
 
 class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
@@ -20,6 +20,8 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "create":
             return BorrowingSerializer
+        if self.action == "list":
+            return BorrowingListSerializer
         return BorrowingSerializer
 
     def perform_create(self, serializer) -> None:
