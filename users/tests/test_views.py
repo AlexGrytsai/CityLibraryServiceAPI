@@ -93,7 +93,6 @@ class UserPasswordUpdateViewTestCase(TestCase):
             "password": "new!!!32password",
         }
         response = self.client.put(reverse("users:password"), data=data)
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             get_user_model()
