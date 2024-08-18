@@ -54,10 +54,18 @@ def generate_fake_books_data_for_db() -> list:
 
 def generator_fake_borrowing_data_for_db() -> list:
     borrowed_books = []
+    unique_combination_book_and_user = []
     for i in range(1000):
         pk = i + 30
         user_id = random.randint(30, 130)
         book_id = random.randint(30, 1130)
+        while True:
+            if (book_id, user_id) in unique_combination_book_and_user:
+                book_id = random.randint(30, 1130)
+            else:
+                break
+        unique_combination_book_and_user.append((book_id, user_id))
+
         borrowed_book = {
             "model": "borrowing.borrowing",
             "pk": pk,
