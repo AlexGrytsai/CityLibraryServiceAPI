@@ -44,7 +44,7 @@ def generate_fake_books_data_for_db() -> list:
                 "author": author,
                 "cover": random.choice(["HARD", "SOFT"]),
                 "inventory": random.randint(0, 10),
-                "daily_fee": daily_fee
+                "daily_fee": daily_fee,
             },
         }
 
@@ -52,7 +52,40 @@ def generate_fake_books_data_for_db() -> list:
     return books_data
 
 
+def generator_fake_borrowing_data_for_db() -> list:
+    borrowed_books = []
+    for i in range(1000):
+        pk = i + 30
+        user_id = random.randint(30, 130)
+        book_id = random.randint(30, 1130)
+        borrowed_book = {
+            "model": "borrowing.borrowing",
+            "pk": pk,
+            "fields": {
+                "borrow_date": str(
+                    fake.date_between(start_date="-1y", end_date="today")
+                ),
+                "expected_return_date": str(
+                    fake.date_between(start_date="today", end_date="+1y")
+                ),
+                "return_date": str(
+                    fake.date_between(start_date="today", end_date="+1y")
+                ),
+                "user_id": user_id,
+                "book_id": book_id,
+            },
+        }
+        borrowed_books.append(borrowed_book)
+    return borrowed_books
+
+
 def data_fusion(*args, **kwargs) -> list:
+    """
+    Make a fusion lists to 1 list.
+    """
+    new_data = []
+    for arg in args:
+        new_data.extend(arg)
     new_data = []
     for arg in args:
         new_data.extend(arg)
@@ -80,7 +113,8 @@ def open_json_file(file_name: str) -> list:
 if __name__ == "__main__":
     users = generate_fake_user_data()
     books = generate_fake_books_data_for_db()
+    borrowed = generator_fake_borrowing_data_for_db()
 
-    data_for_json = data_fusion(users, books)
+    data_for_json = data_fusion(users, books, borrowed)
 
     save_users_data_to_json(data_for_json, "example_data_for_db")
