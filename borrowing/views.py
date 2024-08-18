@@ -29,12 +29,20 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         user_id = self.request.query_params.get("user_id")
         is_active = self.request.query_params.get("is_active")
 
-        if user_id and current_user.is_staff:
-            logger.info(
-                f"{current_user} used 'user_id'={user_id} "
-                f"for filter borrowed books"
-            )
-            return super().get_queryset().filter(user__id=user_id)
+        if user_id:
+            if current_user.is_staff:
+
+                logger.info(
+                    f"{current_user} used 'user_id'={user_id} "
+                    f"for filter borrowed books"
+                )
+                return super().get_queryset().filter(user__id=user_id)
+            else:
+                logger.info(
+                    f"{current_user} tried to use 'user_id'={user_id} "
+                    f"for filter borrowed books"
+                )
+                return super().get_queryset().none()
         if is_active:
             logger.info(
                 f"{current_user} used 'is_active'={is_active} "
