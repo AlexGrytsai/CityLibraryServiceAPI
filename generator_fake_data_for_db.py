@@ -68,7 +68,7 @@ def generator_fake_borrowing_data_for_db() -> list:
                 "expected_return_date": str(
                     fake.date_between(start_date="today", end_date="+1y")
                 ),
-                "return_date": str(
+                "actual_return_date": str(
                     fake.date_between(start_date="today", end_date="+1y")
                 ),
                 "user_id": user_id,
