@@ -57,8 +57,8 @@ def generator_fake_borrowing_data_for_db() -> list:
     unique_combination_book_and_user = []
     for i in range(1000):
         pk = i + 30
-        user_id = random.randint(30, 130)
-        book_id = random.randint(30, 1130)
+        user_id = random.randint(30, 129)
+        book_id = random.randint(30, 1129)
         while True:
             if (book_id, user_id) in unique_combination_book_and_user:
                 book_id = random.randint(30, 1130)
