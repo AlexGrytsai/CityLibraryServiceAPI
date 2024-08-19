@@ -159,6 +159,6 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
             data={
                 "message": f"Book {borrowing.book.title} "
-                           f"(id={borrowing.book.id}) returned"
+                f"(id={borrowing.book.id}) returned"
             },
         )
