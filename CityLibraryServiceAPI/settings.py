@@ -14,7 +14,7 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
-from logging import redis_logging
+from loggi import redis_logging
 
 from dotenv import load_dotenv
 
@@ -199,7 +199,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "custom": {
-            "()": "log.log_formatters.CustomFormatter",
+            "()": "loggi.log_formatters.CustomFormatter",
             "format": "{levelname} [{asctime}] ({folder_name}/{filename}) {message}",
             "style": "{",
             "datefmt": "%Y-%m-%d %H:%M:%S",
@@ -208,7 +208,7 @@ LOGGING = {
     "handlers": {
         "redis": {
             "level": "DEBUG",
-            "class": "logging.redis_logging.RedisLogHandler",
+            "class": "loggi.redis_logging.RedisLogHandler",
             "formatter": "custom",
         },
         "file": {
@@ -235,7 +235,7 @@ LOGGING = {
             "propagate": True,
         },
         "security_checking": {
-            "handlers": ["security_console", "file"],
+            "handlers": ["security_console", "file", "redis"],
             "level": "INFO",
             "propagate": True,
         },
