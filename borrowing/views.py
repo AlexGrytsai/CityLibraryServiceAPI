@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import Type
 
 from django.http import HttpRequest
+from drf_spectacular import openapi
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins, serializers, status
 from rest_framework.decorators import action
@@ -19,6 +21,27 @@ from borrowing.serializers import (
 logger = logging.getLogger("my_debug")
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List Borrowings",
+        tags=["Borrowings"],
+        description="Retrieve a list of borrowings, optionally filtered by user ID or active status.",
+        responses={200: BorrowingListSerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a Borrowing",
+        tags=["Borrowings"],
+        description="Retrieve details of a specific borrowing by its ID.",
+        responses={200: BorrowingDetailSerializer},
+    ),
+    create=extend_schema(
+        summary="Create a Borrowing",
+        tags=["Borrowings"],
+        description="Create a new borrowing for a specific book.",
+        request=BorrowingSerializer,
+        responses={201: BorrowingSerializer},
+    ),
+)
 class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = Borrowing.objects.all().select_related("user", "book")
@@ -90,6 +113,19 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
 
         serializer.save(user=self.request.user)
 
+    @extend_schema(
+        summary="Return a Book",
+        tags=["Borrowings"],
+        description="Mark a book as returned for a specific borrowing entry.",
+        responses={200: "Book [title] (id=[book_id]) returned"},
+    )
+    @action(
+        detail=True,
+        methods=["GET"],
+        url_path="return",
+        url_name="return",
+        permission_classes=(IsAdminUser,),
+    )
     @action(
         detail=True,
         methods=["GET"],
@@ -123,6 +159,6 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
             data={
                 "message": f"Book {borrowing.book.title} "
-                f"(id={borrowing.book.id}) returned"
+                           f"(id={borrowing.book.id}) returned"
             },
         )
