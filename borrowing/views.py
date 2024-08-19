@@ -24,6 +24,7 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Borrowing.objects.all().select_related("user", "book")
 
     def get_queryset(self):
+        queryset = super(BorrowingView, self).get_queryset()
         current_user = self.request.user
 
         user_id = self.request.query_params.get("user_id")
@@ -36,30 +37,36 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
                     f"{current_user} used 'user_id'={user_id} "
                     f"for filter borrowed books"
                 )
-                return super().get_queryset().filter(user__id=user_id)
+                queryset = queryset.filter(user__id=user_id)
             else:
                 logger.info(
                     f"{current_user} tried to use 'user_id'={user_id} "
                     f"for filter borrowed books"
                 )
-                return super().get_queryset().none()
+                queryset = queryset.none()
         if is_active:
             logger.info(
                 f"{current_user} used 'is_active'={is_active} "
                 f"for filter borrowed books"
             )
-            if is_active.lower() == "true":
-                return (
-                    super()
-                    .get_queryset()
-                    .filter(actual_return_date__isnull=True)
-                )
-            return (
-                super().get_queryset().filter(actual_return_date__isnull=False)
-            )
+            if current_user.is_staff:
+                if is_active.lower() == "true":
+                    queryset = queryset.filter(actual_return_date__isnull=True)
+                else:
+                    queryset = queryset.filter(
+                        actual_return_date__isnull=False
+                    )
+
+            else:
+                if is_active.lower() == "true":
+                    queryset = queryset.filter(actual_return_date__isnull=True)
+                else:
+                    queryset = queryset.filter(
+                        actual_return_date__isnull=False
+                    )
         if current_user.is_staff:
-            return super(BorrowingView, self).get_queryset()
-        return super().get_queryset().filter(user=current_user)
+            return queryset
+        return queryset.filter(user=current_user)
 
     def get_serializer_class(self) -> Type[Serializer]:
         if self.action == "create":
@@ -88,21 +95,19 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         methods=["GET"],
         url_path="return",
         url_name="return",
-        permission_classes=(IsAdminUser,)
+        permission_classes=(IsAdminUser,),
     )
     def return_book(self, request: HttpRequest, pk: int) -> Response:
         borrowing = self.get_object()
         if borrowing.actual_return_date is not None:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
-                data={"message": "Book already returned"}
+                data={"message": "Book already returned"},
             )
 
         borrowing.actual_return_date = datetime.now()
 
-        logger.info(
-            f"Inventory until returning: {borrowing.book.inventory}"
-        )
+        logger.info(f"Inventory until returning: {borrowing.book.inventory}")
 
         borrowing.book.inventory += 1
         borrowing.book.save()
@@ -117,8 +122,7 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         return Response(
             status=status.HTTP_200_OK,
             data={
-                "message":
-                    f"Book {borrowing.book.title} "
-                    f"(id={borrowing.book.id}) returned"
-            }
+                "message": f"Book {borrowing.book.title} "
+                f"(id={borrowing.book.id}) returned"
+            },
         )
