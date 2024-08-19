@@ -8,8 +8,11 @@ from rest_framework.test import APIClient
 
 from books.models import Book
 from borrowing.models import Borrowing
-from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, \
-    BorrowingDetailSerializer
+from borrowing.serializers import (
+    BorrowingSerializer,
+    BorrowingListSerializer,
+    BorrowingDetailSerializer,
+)
 from borrowing.views import BorrowingView
 
 
@@ -89,15 +92,13 @@ class TestBorrowingView(TestCase):
 
         self.client.force_authenticate(self.admin)
         response = self.client.get(
-            reverse("borrowing:borrowing-list")
-            + f"?is_active=true"
+            reverse("borrowing:borrowing-list") + f"?is_active=true"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
         response = self.client.get(
-            reverse("borrowing:borrowing-list")
-            + f"?is_active=false"
+            reverse("borrowing:borrowing-list") + f"?is_active=false"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 0)
@@ -115,4 +116,72 @@ class TestBorrowingView(TestCase):
         self.assertEqual(view.get_serializer_class(), BorrowingSerializer)
 
         view.action = "retrieve"
-        self.assertEqual(view.get_serializer_class(), BorrowingDetailSerializer)
+        self.assertEqual(
+            view.get_serializer_class(), BorrowingDetailSerializer
+        )
+
+    def test_perform_create_success(self):
+        test_book = Book.objects.create(
+            title="Test Book 2",
+            author="John Doe",
+            cover=Book.Cover.HARD,
+            inventory=2,
+            daily_fee=5.99,
+        )
+        self.client.force_authenticate(self.regular_user)
+        data = {
+            "book": test_book.id,
+            "expected_return_date": date.today() + timedelta(days=14),
+        }
+
+        response = self.client.post(
+            reverse("borrowing:borrowing-list"), data=data
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        test_book.refresh_from_db()
+        self.assertEqual(test_book.inventory, 1)
+
+    def test_perform_create_book_not_available(self):
+        test_book = Book.objects.create(
+            title="Test Book 2",
+            author="John Doe",
+            cover=Book.Cover.HARD,
+            inventory=0,
+            daily_fee=5.99,
+        )
+
+        self.client.force_authenticate(self.regular_user)
+        data = {
+            "book": test_book.id,
+            "expected_return_date": date.today() + timedelta(days=14),
+        }
+
+        response = self.client.post(
+            reverse("borrowing:borrowing-list"), data=data
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_return_book_success(self):
+        self.client.force_authenticate(self.admin)
+        url = reverse(
+            "borrowing:borrowing-return", kwargs={"pk": self.borrowing1.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.borrowing1.refresh_from_db()
+        self.assertIsNotNone(self.borrowing1.actual_return_date)
+        self.book.refresh_from_db()
+        self.assertEqual(self.book.inventory, 11)
+
+    def test_return_book_already_returned(self):
+        self.client.force_authenticate(self.admin)
+        self.borrowing1.actual_return_date = date.today() - timedelta(days=1)
+        self.borrowing1.save()
+
+        url = reverse(
+            "borrowing:borrowing-return", kwargs={"pk": self.borrowing1.id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["message"], "Book already returned")
