@@ -70,3 +70,31 @@ class TestBorrowingView(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
+
+    def test_retrieve_borrowings_filter_by_is_active_parameter(self):
+        response = self.client.get(
+            reverse("borrowing:borrowing-list") + f"?is_active=true"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.client.force_authenticate(self.regular_user)
+        response = self.client.get(
+            reverse("borrowing:borrowing-list") + f"?is_active=true"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 1)
+
+        self.client.force_authenticate(self.admin)
+        response = self.client.get(
+            reverse("borrowing:borrowing-list")
+            + f"?is_active=true"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 2)
+
+        response = self.client.get(
+            reverse("borrowing:borrowing-list")
+            + f"?is_active=false"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data["results"]), 0)
