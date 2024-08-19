@@ -8,6 +8,9 @@ from rest_framework.test import APIClient
 
 from books.models import Book
 from borrowing.models import Borrowing
+from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, \
+    BorrowingDetailSerializer
+from borrowing.views import BorrowingView
 
 
 class TestBorrowingView(TestCase):
@@ -98,3 +101,18 @@ class TestBorrowingView(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 0)
+
+    def test_get_serializer_class(self):
+        view = BorrowingView()
+
+        view.action = None
+        self.assertEqual(view.get_serializer_class(), BorrowingSerializer)
+
+        view.action = "list"
+        self.assertEqual(view.get_serializer_class(), BorrowingListSerializer)
+
+        view.action = "create"
+        self.assertEqual(view.get_serializer_class(), BorrowingSerializer)
+
+        view.action = "retrieve"
+        self.assertEqual(view.get_serializer_class(), BorrowingDetailSerializer)
