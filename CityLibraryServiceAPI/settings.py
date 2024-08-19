@@ -14,7 +14,7 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
-from log import redis_logging
+from logging import redis_logging
 
 from dotenv import load_dotenv
 
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "rest_framework",
+    "logging",
     "users",
     "books",
     "drf_spectacular",
@@ -207,7 +208,7 @@ LOGGING = {
     "handlers": {
         "redis": {
             "level": "DEBUG",
-            "class": "log.redis_logging.RedisLogHandler",
+            "class": "logging.redis_logging.RedisLogHandler",
             "formatter": "custom",
         },
         "file": {
