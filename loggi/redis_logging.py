@@ -7,7 +7,7 @@ class RedisLogHandler(logging.Handler):
     def __init__(self) -> None:
         logging.Handler.__init__(self)
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord) -> None:
         level = record.levelname
         data_time = record.asctime
         folder_name = record.folder_name
