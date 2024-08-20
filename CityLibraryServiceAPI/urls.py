@@ -15,11 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from debug_toolbar.toolbar import debug_toolbar_urls
 from django.contrib.auth.views import LogoutView
-
 # from django.contrib import admin
 from django.urls import path, include
-from debug_toolbar.toolbar import debug_toolbar_urls
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -28,33 +27,37 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path(
-        "api/v1/users/token/",
-        TokenObtainPairView.as_view(),
-        name="token_obtain_pair",
-    ),
-    path(
-        "api/v1/users/token/refresh/",
-        TokenRefreshView.as_view(),
-        name="token_refresh",
-    ),
-    path(
-        "api/v1/users/token/verify/",
-        TokenVerifyView.as_view(),
-        name="token_verify",
-    ),
-    path(
-        "api/v1/users/token/logout/",
-        LogoutView.as_view(),
-        name="token_logout",
-    ),
-    path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/v1/doc/swagger/",
-        SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
-    ),
-    path("api/v1/users/", include("users.urls", namespace="users")),
-    path("api/v1/", include("books.urls", namespace="books")),
-    path("api/v1/", include("borrowing.urls", namespace="borrowing")),
-] + debug_toolbar_urls()
+                  path(
+                      "api/v1/users/token/",
+                      TokenObtainPairView.as_view(),
+                      name="token_obtain_pair",
+                  ),
+                  path(
+                      "api/v1/users/token/refresh/",
+                      TokenRefreshView.as_view(),
+                      name="token_refresh",
+                  ),
+                  path(
+                      "api/v1/users/token/verify/",
+                      TokenVerifyView.as_view(),
+                      name="token_verify",
+                  ),
+                  path(
+                      "api/v1/users/token/logout/",
+                      LogoutView.as_view(),
+                      name="token_logout",
+                  ),
+                  path("api/v1/schema/", SpectacularAPIView.as_view(),
+                       name="schema"),
+                  path(
+                      "api/v1/doc/swagger/",
+                      SpectacularSwaggerView.as_view(url_name="schema"),
+                      name="swagger-ui",
+                  ),
+                  path("api/v1/users/",
+                       include("users.urls", namespace="users")),
+                  path("api/v1/", include("books.urls", namespace="books")),
+                  path("api/v1/",
+                       include("borrowing.urls", namespace="borrowing")),
+                  path("api/v1/", include("loggi.urls", namespace="loggi"))
+              ] + debug_toolbar_urls()

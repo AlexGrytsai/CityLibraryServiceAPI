@@ -14,6 +14,7 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+from loggi import redis_logging
 
 from dotenv import load_dotenv
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "rest_framework",
+    "logging",
     "users",
     "books",
     "borrowing",
@@ -198,7 +200,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "custom": {
-            "()": "CityLibraryServiceAPI.log_formatters.CustomFormatter",
+            "()": "loggi.log_formatters.CustomFormatter",
             "format": "{levelname} [{asctime}] ({folder_name}/{filename}) {message}",
             "style": "{",
             "datefmt": "%Y-%m-%d %H:%M:%S",
@@ -210,6 +212,11 @@ LOGGING = {
         },
     },
     "handlers": {
+        "redis": {
+            "level": "DEBUG",
+            "class": "loggi.redis_logging.RedisLogHandler",
+            "formatter": "custom",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -235,12 +242,12 @@ LOGGING = {
     },
     "loggers": {
         "django": {
-            "handlers": ["file", "console"],
+            "handlers": ["file", "console", "redis"],
             "level": "INFO",
             "propagate": True,
         },
         "security_checking": {
-            "handlers": ["security_console", "file"],
+            "handlers": ["security_console", "file", "redis"],
             "level": "INFO",
             "propagate": True,
         },
