@@ -1,9 +1,9 @@
 from django.urls import path
 
-from loggi.views import LoggingListView
+from loggi.views import LoggingListAPIView
 
 urlpatterns = [
-    path("logs/", LoggingListView.as_view(), name="logs")
+    path("logs/", LoggingListAPIView.as_view(), name="logs")
 ]
 
 app_name = "loggi"
