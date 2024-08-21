@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from books.models import Book
 from borrowing.models import Borrowing
+from borrowing.tasks import notify_new_borrowing
 
 logger = logging.getLogger("my_debug")
 
@@ -23,6 +24,12 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data: dict) -> Borrowing:
         logger.info(f"User borrowed book '{validated_data['book']}'")
+
+        user = validated_data["user"]
+        book = validated_data["book"]
+        message = f"{user} (id={user.id}) borrowed book '{book}' (id={book.id})"
+
+        notify_new_borrowing(message)
 
         return Borrowing.objects.create(**validated_data)
 
