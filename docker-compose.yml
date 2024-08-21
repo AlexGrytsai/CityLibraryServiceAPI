@@ -12,28 +12,28 @@ services:
       - redis-server
       - /usr/local/etc/redis/redis_logs.conf
 
-  celery:
-    build:
-      context: .
-    command: celery -A CityLibraryServiceAPI worker --loglevel=INFO
-    restart: on-failure
-    env_file:
-      - .env
-    depends_on:
-      - redis
-
-  flower:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "5555:5555"
-    command: celery -A CityLibraryServiceAPI flower --address=0.0.0.0
-    restart: on-failure
-    env_file:
-      - .env
-    depends_on:
-      - celery
+#  celery:
+#    build:
+#      context: .
+#    command: celery -A CityLibraryServiceAPI worker --loglevel=INFO
+#    restart: on-failure
+#    env_file:
+#      - .env
+#    depends_on:
+#      - redis
+#
+#  flower:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    ports:
+#      - "5555:5555"
+#    command: celery -A CityLibraryServiceAPI flower --address=0.0.0.0
+#    restart: on-failure
+#    env_file:
+#      - .env
+#    depends_on:
+#      - celery
 
 volumes:
   redis_data:
