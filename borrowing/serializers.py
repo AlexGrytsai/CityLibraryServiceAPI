@@ -27,7 +27,9 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
         user = validated_data["user"]
         book = validated_data["book"]
-        message = f"{user} (id={user.id}) borrowed book '{book}' (id={book.id})"
+        message = (
+            f"{user} (id={user.id}) borrowed book '{book}' (id={book.id})"
+        )
 
         notify_new_borrowing(message)
 

@@ -54,7 +54,8 @@ class UserCreateView(generics.CreateAPIView):
     patch=extend_schema(
         summary="Partially update current user details",
         tags=["Users"],
-        description="Partially update the details of the currently authenticated user.",
+        description="Partially update the details of the currently "
+                    "authenticated user.",
         request=UserUpdateSerializer,
         responses={200: UserUpdateSerializer},
     ),
