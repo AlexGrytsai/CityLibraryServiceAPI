@@ -1,4 +1,6 @@
+import logging
 from datetime import date, timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -17,7 +19,8 @@ from borrowing.views import BorrowingView
 
 
 class TestBorrowingView(TestCase):
-    def setUp(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def setUp(self, mock_notify_new_borrowing):
         self.client = APIClient()
 
         self.admin = get_user_model().objects.create_user(
@@ -43,20 +46,31 @@ class TestBorrowingView(TestCase):
             book=self.book,
             expected_return_date=future_date,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
-    def test_retrieve_all_borrowings_for_admin(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_retrieve_all_borrowings_for_admin(
+        self, mock_notify_new_borrowing
+    ):
         self.client.force_authenticate(self.admin)
         response = self.client.get(reverse("borrowing:borrowing-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
-    def test_retrieve_borrowings_for_regular_user(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_retrieve_borrowings_for_regular_user(
+        self, mock_notify_new_borrowing
+    ):
         self.client.force_authenticate(self.regular_user)
         response = self.client.get(reverse("borrowing:borrowing-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
-    def test_retrieve_borrowings_filtered_by_user_id_for_only_admin(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_retrieve_borrowings_filtered_by_user_id_for_only_admin(
+        self, mock_notify_new_borrowing
+    ):
         response = self.client.get(
             reverse("borrowing:borrowing-list") + f"?user_id={self.admin.id}"
         )
@@ -77,33 +91,37 @@ class TestBorrowingView(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
-    def test_retrieve_borrowings_filter_by_is_active_parameter(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_retrieve_borrowings_filter_by_is_active_parameter(
+        self, mock_notify_new_borrowing
+    ):
         response = self.client.get(
-            reverse("borrowing:borrowing-list") + f"?is_active=true"
+            reverse("borrowing:borrowing-list") + "?is_active=true"
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         self.client.force_authenticate(self.regular_user)
         response = self.client.get(
-            reverse("borrowing:borrowing-list") + f"?is_active=true"
+            reverse("borrowing:borrowing-list") + "?is_active=true"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
         self.client.force_authenticate(self.admin)
         response = self.client.get(
-            reverse("borrowing:borrowing-list") + f"?is_active=true"
+            reverse("borrowing:borrowing-list") + "?is_active=true"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 2)
 
         response = self.client.get(
-            reverse("borrowing:borrowing-list") + f"?is_active=false"
+            reverse("borrowing:borrowing-list") + "?is_active=false"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 0)
 
-    def test_get_serializer_class(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_get_serializer_class(self, mock_notify_new_borrowing):
         view = BorrowingView()
 
         view.action = None
@@ -120,7 +138,8 @@ class TestBorrowingView(TestCase):
             view.get_serializer_class(), BorrowingDetailSerializer
         )
 
-    def test_perform_create_success(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_perform_create_success(self, mock_notify_new_borrowing):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
@@ -141,7 +160,10 @@ class TestBorrowingView(TestCase):
         test_book.refresh_from_db()
         self.assertEqual(test_book.inventory, 1)
 
-    def test_perform_create_book_not_available(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_perform_create_book_not_available(
+        self, mock_notify_new_borrowing
+    ):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
@@ -161,7 +183,8 @@ class TestBorrowingView(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_return_book_success(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_return_book_success(self, mock_notify_new_borrowing):
         self.client.force_authenticate(self.admin)
         url = reverse(
             "borrowing:borrowing-return", kwargs={"pk": self.borrowing1.id}
@@ -174,7 +197,8 @@ class TestBorrowingView(TestCase):
         self.book.refresh_from_db()
         self.assertEqual(self.book.inventory, 11)
 
-    def test_return_book_already_returned(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_return_book_already_returned(self, mock_notify_new_borrowing):
         self.client.force_authenticate(self.admin)
         self.borrowing1.actual_return_date = date.today() - timedelta(days=1)
         self.borrowing1.save()

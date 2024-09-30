@@ -1,4 +1,6 @@
+import logging
 from datetime import date, timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -21,8 +23,11 @@ class TestBorrowingModel(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
-    def test_borrowing_str_representation(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_borrowing_str_representation(self, mock_notify_new_borrowing):
         future_date = date.today() + timedelta(days=7)
         borrowing = Borrowing.objects.create(
             user=self.user, book=self.book, expected_return_date=future_date

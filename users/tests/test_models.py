@@ -22,11 +22,14 @@ class TestUserModel(TestCase):
         )
         self.assertEqual(str(user), "John Doe")
 
-    def test_user_str_representation_with_username(self):
+    def test_user_str_representation_with_first_and_last_name(self):
         user = self.User.objects.create_user(
-            email="test@example.com", username="testuser", password="password"
+            email="test@example.com",
+            password="password",
+            first_name="John",
+            last_name="Doe"
         )
-        self.assertEqual(str(user), "testuser")
+        self.assertEqual(str(user), "John Doe")
 
     def test_user_str_representation_with_empty_fields(self):
         user = self.User.objects.create_user(

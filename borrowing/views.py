@@ -3,12 +3,11 @@ from datetime import datetime
 from typing import Type
 
 from django.http import HttpRequest
-from drf_spectacular import openapi
 from drf_spectacular.utils import extend_schema_view, extend_schema
-from rest_framework.response import Response
 from rest_framework import viewsets, mixins, serializers, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
 from borrowing.models import Borrowing
@@ -25,7 +24,8 @@ logger = logging.getLogger("my_debug")
     list=extend_schema(
         summary="List Borrowings",
         tags=["Borrowings"],
-        description="Retrieve a list of borrowings, optionally filtered by user ID or active status.",
+        description="Retrieve a list of borrowings, "
+                    "optionally filtered by user ID or active status.",
         responses={200: BorrowingListSerializer(many=True)},
     ),
     retrieve=extend_schema(
@@ -159,6 +159,6 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
             data={
                 "message": f"Book {borrowing.book.title} "
-                f"(id={borrowing.book.id}) returned"
+                           f"(id={borrowing.book.id}) returned"
             },
         )

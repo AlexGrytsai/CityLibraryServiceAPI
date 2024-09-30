@@ -1,3 +1,5 @@
+import logging
+
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -5,6 +7,9 @@ from books.models import Book
 
 
 class BookModelTest(TestCase):
+    def setUp(self):
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_book_string_representation(self):
         book = Book.objects.create(
@@ -14,7 +19,7 @@ class BookModelTest(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
-        self.assertEqual(str(book), "Test Book by John Doe")
+        self.assertEqual(str(book), "Test Book by John Doe (id: 1)")
 
     def test_book_ordering(self):
         book1 = Book.objects.create(
