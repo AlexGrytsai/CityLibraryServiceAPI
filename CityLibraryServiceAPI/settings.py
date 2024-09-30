@@ -14,6 +14,9 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+
+from celery.schedules import crontab
+
 from loggi import redis_logging
 
 from dotenv import load_dotenv
@@ -238,7 +241,7 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": "my_debug.log",
             "formatter": "info",
-        }
+        },
     },
     "loggers": {
         "django": {
@@ -268,3 +271,10 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "Europe/Kiev"
 CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE = {
+    "check-overdue-borrowings-every-day": {
+        "task": "notification.tasks.notify_overdue_borrowings",
+        "schedule": crontab(hour="8", minute="0"),
+    },
+}
