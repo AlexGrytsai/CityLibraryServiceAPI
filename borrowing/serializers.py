@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from books.models import Book
 from borrowing.models import Borrowing
-from borrowing.tasks import notify_new_borrowing
+from notification.tasks import notify_new_borrowing
 
 logger = logging.getLogger("my_debug")
 

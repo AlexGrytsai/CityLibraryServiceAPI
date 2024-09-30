@@ -11,7 +11,15 @@ load_dotenv()
 logger = logging.getLogger("my_debug")
 
 telegram_token = os.getenv("TELEGRAM_TOKEN")
-bot = Bot(token=telegram_token)
+if not telegram_token:
+    logger.error("TELEGRAM_TOKEN is not set")
+    raise ValueError("TELEGRAM_TOKEN is not set")
+
+try:
+    bot = Bot(token=telegram_token)
+except Exception as e:
+    logger.error(f"Telegram bot error: {e}")
+    raise
 
 
 def get_staff_users_chat_ids_list() -> list[int]:
