@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -26,6 +28,8 @@ class BookViewSetTestCase(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_get_book_list(self):
         response = self.client.get(reverse("books:book-list"))

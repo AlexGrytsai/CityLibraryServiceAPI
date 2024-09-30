@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 from unittest.mock import patch
 
@@ -45,6 +46,8 @@ class TestBorrowingView(TestCase):
             book=self.book,
             expected_return_date=future_date,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     @patch("borrowing.serializers.notify_new_borrowing")
     def test_retrieve_all_borrowings_for_admin(

@@ -1,3 +1,5 @@
+import logging
+
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -5,6 +7,9 @@ from books.models import Book
 
 
 class BookModelTest(TestCase):
+    def setUp(self):
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_book_string_representation(self):
         book = Book.objects.create(

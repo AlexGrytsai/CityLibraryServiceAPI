@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 from unittest.mock import patch
 
@@ -22,6 +23,8 @@ class TestBorrowingModel(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     @patch("borrowing.serializers.notify_new_borrowing")
     def test_borrowing_str_representation(self, mock_notify_new_borrowing):
@@ -33,10 +36,7 @@ class TestBorrowingModel(TestCase):
             str(borrowing), "Test Book borrowed by test@example.com"
         )
 
-    @patch("borrowing.serializers.notify_new_borrowing")
-    def test_borrowing_creation_fails_with_invalid_dates(
-        self, mock_notify_new_borrowing
-    ):
+    def test_borrowing_creation_fails_with_invalid_dates(self):
         with self.assertRaises(IntegrityError):
             Borrowing.objects.create(
                 user=self.user,
@@ -44,10 +44,7 @@ class TestBorrowingModel(TestCase):
                 expected_return_date="2022-12-31",
             )
 
-    @patch("borrowing.serializers.notify_new_borrowing")
-    def test_borrowing_creation_fails_with_non_unique_combination(
-        self, mock_notify_new_borrowing
-    ):
+    def test_borrowing_creation_fails_with_non_unique_combination(self):
         future_date = date.today() + timedelta(days=7)
 
         Borrowing.objects.create(
@@ -60,10 +57,7 @@ class TestBorrowingModel(TestCase):
                 expected_return_date=future_date,
             )
 
-    @patch("borrowing.serializers.notify_new_borrowing")
-    def test_borrowing_save_fails_when_modifying_actual_return_date(
-        self, mock_notify_new_borrowing
-    ):
+    def test_borrowing_save_fails_when_modifying_actual_return_date(self):
         future_date = date.today() + timedelta(days=7)
         borrowing = Borrowing.objects.create(
             user=self.user,

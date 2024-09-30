@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -8,6 +10,8 @@ from rest_framework.test import APIClient
 class UserCreateViewTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_post_request(self):
         data = {
