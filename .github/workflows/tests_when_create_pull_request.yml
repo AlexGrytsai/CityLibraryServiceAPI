@@ -28,4 +28,4 @@ jobs:
       run: flake8 .
 
     - name: Run tests
-      run: python manage.py test
+      run: TELEGRAM_TOKEN=token python manage.py test
