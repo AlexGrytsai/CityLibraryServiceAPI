@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -17,7 +18,8 @@ from borrowing.views import BorrowingView
 
 
 class TestBorrowingView(TestCase):
-    def setUp(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def setUp(self, mock_notify_new_borrowing):
         self.client = APIClient()
 
         self.admin = get_user_model().objects.create_user(
@@ -120,7 +122,8 @@ class TestBorrowingView(TestCase):
             view.get_serializer_class(), BorrowingDetailSerializer
         )
 
-    def test_perform_create_success(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_perform_create_success(self, mock_notify_new_borrowing):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
@@ -141,7 +144,10 @@ class TestBorrowingView(TestCase):
         test_book.refresh_from_db()
         self.assertEqual(test_book.inventory, 1)
 
-    def test_perform_create_book_not_available(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_perform_create_book_not_available(
+        self, mock_notify_new_borrowing
+    ):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
