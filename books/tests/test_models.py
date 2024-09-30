@@ -14,7 +14,7 @@ class BookModelTest(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
-        self.assertEqual(str(book), "Test Book by John Doe")
+        self.assertEqual(str(book), "Test Book by John Doe (id: 1)")
 
     def test_book_ordering(self):
         book1 = Book.objects.create(
