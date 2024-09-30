@@ -26,7 +26,7 @@ logger = logging.getLogger("my_debug")
         summary="List Borrowings",
         tags=["Borrowings"],
         description="Retrieve a list of borrowings, "
-                    "optionally filtered by user ID or active status.",
+        "optionally filtered by user ID or active status.",
         responses={200: BorrowingListSerializer(many=True)},
     ),
     retrieve=extend_schema(
