@@ -27,8 +27,9 @@ class TelegramNotification:
         staff_users_chat_ids = os.getenv("STAFFUSERS_CHAT_IDS").split(",")
         if staff_users_chat_ids:
             list_chat_ids = [
-                int(chat_id) for chat_id in staff_users_chat_ids if
-                chat_id.strip()
+                int(chat_id)
+                for chat_id in staff_users_chat_ids
+                if chat_id.strip()
             ]
             logger.info(f"Staff users chat ids: {list_chat_ids}")
             return list_chat_ids

@@ -23,6 +23,7 @@ def notify_new_borrowing(borrowing_details: str) -> None:
         TelegramNotification().send_telegram_message_to_staff_users(message)
     )
 
+
 @shared_task
 def notify_overdue_borrowings() -> None:
     tomorrow_date = today() + timedelta(days=1)
@@ -33,7 +34,8 @@ def notify_overdue_borrowings() -> None:
         message = "No borrowings overdue today!"
         asyncio.run(
             TelegramNotification().send_telegram_message_to_staff_users(
-                message)
+                message
+            )
         )
     else:
         for borrowing in overdue_borrowings:
@@ -45,5 +47,6 @@ def notify_overdue_borrowings() -> None:
             )
             asyncio.run(
                 TelegramNotification().send_telegram_message_to_staff_users(
-                    message)
+                    message
+                )
             )
