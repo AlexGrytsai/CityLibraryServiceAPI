@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -22,7 +23,8 @@ class TestBorrowingModel(TestCase):
             daily_fee=5.99,
         )
 
-    def test_borrowing_str_representation(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_borrowing_str_representation(self, mock_notify_new_borrowing):
         future_date = date.today() + timedelta(days=7)
         borrowing = Borrowing.objects.create(
             user=self.user, book=self.book, expected_return_date=future_date
@@ -31,7 +33,8 @@ class TestBorrowingModel(TestCase):
             str(borrowing), "Test Book borrowed by test@example.com"
         )
 
-    def test_borrowing_creation_fails_with_invalid_dates(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_borrowing_creation_fails_with_invalid_dates(self, mock_notify_new_borrowing):
         with self.assertRaises(IntegrityError):
             Borrowing.objects.create(
                 user=self.user,
@@ -39,7 +42,8 @@ class TestBorrowingModel(TestCase):
                 expected_return_date="2022-12-31",
             )
 
-    def test_borrowing_creation_fails_with_non_unique_combination(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_borrowing_creation_fails_with_non_unique_combination(self, mock_notify_new_borrowing):
         future_date = date.today() + timedelta(days=7)
 
         Borrowing.objects.create(
@@ -52,7 +56,8 @@ class TestBorrowingModel(TestCase):
                 expected_return_date=future_date,
             )
 
-    def test_borrowing_save_fails_when_modifying_actual_return_date(self):
+    @patch("borrowing.serializers.notify_new_borrowing")
+    def test_borrowing_save_fails_when_modifying_actual_return_date(self, mock_notify_new_borrowing):
         future_date = date.today() + timedelta(days=7)
         borrowing = Borrowing.objects.create(
             user=self.user,
