@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "users",
     "books",
     "borrowing",
+    "payment",
     "drf_spectacular",
 ]
 
