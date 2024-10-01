@@ -217,7 +217,7 @@ LOGGING = {
     },
     "handlers": {
         "redis": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "loggi.redis_logging.RedisLogHandler",
             "formatter": "custom",
         },
