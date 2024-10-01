@@ -16,6 +16,7 @@ from borrowing.serializers import (
     BorrowingListSerializer,
     BorrowingDetailSerializer,
 )
+from payment.stripe_service import PaymentManager
 
 logger = logging.getLogger("my_debug")
 
@@ -147,6 +148,8 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
 
         borrowing.book.inventory += 1
         borrowing.book.save()
+
+        PaymentManager(borrowing)
 
         logger.info(
             f"Book (id={borrowing.book.id}) returned "
