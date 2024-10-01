@@ -58,5 +58,5 @@ urlpatterns = [
     path("api/v1/", include("books.urls", namespace="books")),
     path("api/v1/", include("borrowing.urls", namespace="borrowing")),
     path("api/v1/", include("loggi.urls", namespace="loggi")),
-    path("api/v1/", include("payment.urls", namespace="payment")),
+    path("", include("payment.urls", namespace="payment")),
 ] + debug_toolbar_urls()
