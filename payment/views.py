@@ -6,19 +6,23 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from payment.models import PaymentModel
-from payment.serializers import PaymentSerializer
+from payment.serializers import PaymentListSerializer, PaymentDetailSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class PaymentView(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
-    serializer_class = PaymentSerializer
 
     def get_queryset(self):
         if self.request.user.is_staff:
             return PaymentModel.objects.all()
         return PaymentModel.objects.filter(borrow__user=self.request.user)
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return PaymentListSerializer
+        return PaymentDetailSerializer
 
 
 class PaymentSuccessView(APIView):
