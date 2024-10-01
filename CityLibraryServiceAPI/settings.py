@@ -279,3 +279,6 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour="8", minute="0"),
     },
 }
+
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
