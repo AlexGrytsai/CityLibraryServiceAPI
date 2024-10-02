@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from notification.tasks import notify_successfully_payed
 from payment.models import PaymentModel
 from payment.serializers import PaymentListSerializer, PaymentDetailSerializer
 
@@ -36,6 +37,12 @@ class PaymentSuccessView(APIView):
             payment = PaymentModel.objects.get(session_id=session_id)
             payment.status = PaymentModel.Status.PAID
             payment.save()
+
+            message = (f"Payment successful for {payment.borrow.user.email} "
+                       f"(id={payment.borrow.user.id}) \n"
+                       f"for borrowing ID {payment.borrow.id}.")
+
+            notify_successfully_payed.delay(message)
             return JsonResponse({"message": "Payment successful!"})
         return JsonResponse(
             {"message": "Payment not completed."}, status=400
