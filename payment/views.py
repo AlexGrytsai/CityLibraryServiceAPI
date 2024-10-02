@@ -95,7 +95,8 @@ class PaymentSuccessView(APIView):
                 description="Payment can be completed within 24 hours."
             )
         },
-        description="Notify user that payment can be completed within 24 hours.",
+        description="Notify user that payment can be completed "
+                    "within 24 hours.",
     )
 )
 class PaymentCancelView(APIView):
