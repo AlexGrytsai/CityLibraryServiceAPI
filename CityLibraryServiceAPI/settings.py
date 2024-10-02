@@ -280,7 +280,7 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
-STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_SUCCESS_URL = "http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}"
 STRIPE_CANCEL_URL = "http://localhost:8000/cancel"

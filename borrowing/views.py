@@ -151,7 +151,8 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         borrowing.book.inventory += 1
         borrowing.book.save()
 
-        if borrowing.actual_return_date.date() > borrowing.expected_return_date:
+        if (borrowing.actual_return_date.date() >
+            borrowing.expected_return_date):
             PaymentManager().create_fine_payment(borrowing)
 
         logger.info(
