@@ -37,7 +37,9 @@ class PaymentSuccessView(APIView):
             payment.status = PaymentModel.Status.PAID
             payment.save()
             return JsonResponse({"message": "Payment successful!"})
-        return JsonResponse({"message": "Payment not completed."}, status=400)
+        return JsonResponse(
+            {"message": "Payment not completed."}, status=400
+        )
 
 
 class PaymentCancelView(APIView):
