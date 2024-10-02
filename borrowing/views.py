@@ -26,7 +26,7 @@ logger = logging.getLogger("my_debug")
         summary="List Borrowings",
         tags=["Borrowings"],
         description="Retrieve a list of borrowings, "
-                    "optionally filtered by user ID or active status.",
+        "optionally filtered by user ID or active status.",
         responses={200: BorrowingListSerializer(many=True)},
     ),
     retrieve=extend_schema(
@@ -151,8 +151,10 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         borrowing.book.inventory += 1
         borrowing.book.save()
 
-        if (borrowing.actual_return_date.date() >
-            borrowing.expected_return_date):
+        if (
+            borrowing.actual_return_date.date()
+            > borrowing.expected_return_date
+        ):
             PaymentManager().create_fine_payment(borrowing)
 
         logger.info(
@@ -166,6 +168,6 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
             data={
                 "message": f"Book {borrowing.book.title} "
-                           f"(id={borrowing.book.id}) returned"
+                f"(id={borrowing.book.id}) returned"
             },
         )
