@@ -50,3 +50,12 @@ def notify_overdue_borrowings() -> None:
                     message
                 )
             )
+
+
+@shared_task
+def notify_successfully_payed(message: str) -> None:
+    asyncio.run(
+        TelegramNotification().send_telegram_message_to_staff_users(
+            message
+        )
+    )
