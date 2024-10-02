@@ -1,8 +1,12 @@
 import stripe
 from django.conf import settings
 from django.http import JsonResponse, HttpRequest
-from drf_spectacular.utils import extend_schema_view, extend_schema, \
-    OpenApiParameter, OpenApiResponse
+from drf_spectacular.utils import (
+    extend_schema_view,
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+)
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -20,14 +24,14 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
             200: PaymentListSerializer,
         },
         description="Retrieve list of payments for the current user "
-                    "or all payments for staff.",
+        "or all payments for staff.",
     ),
     retrieve=extend_schema(
         responses={
             200: PaymentDetailSerializer,
         },
-        description="Retrieve detailed information about a specific payment."
-    )
+        description="Retrieve detailed information about a specific payment.",
+    ),
 )
 class PaymentView(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
@@ -42,6 +46,7 @@ class PaymentView(viewsets.ReadOnlyModelViewSet):
             return PaymentListSerializer
         return PaymentDetailSerializer
 
+
 @extend_schema_view(
     get=extend_schema(
         parameters=[
@@ -49,15 +54,15 @@ class PaymentView(viewsets.ReadOnlyModelViewSet):
                 name="session_id",
                 description="Stripe session ID to verify the payment",
                 required=True,
-                type=str
+                type=str,
             ),
         ],
         responses={
             200: OpenApiResponse(description="Payment successful!"),
-            400: OpenApiResponse(description="Payment not completed.")
+            400: OpenApiResponse(description="Payment not completed."),
         },
         description="Verify Stripe payment by session_id "
-                    "and update payment status."
+        "and update payment status.",
     )
 )
 class PaymentSuccessView(APIView):
@@ -72,15 +77,16 @@ class PaymentSuccessView(APIView):
             payment.status = PaymentModel.Status.PAID
             payment.save()
 
-            message = (f"Payment successful for {payment.borrow.user.email} "
-                       f"(id={payment.borrow.user.id}) \n"
-                       f"for borrowing ID {payment.borrow.id}.")
+            message = (
+                f"Payment successful for {payment.borrow.user.email} "
+                f"(id={payment.borrow.user.id}) \n"
+                f"for borrowing ID {payment.borrow.id}."
+            )
 
             notify_successfully_payed.delay(message)
             return JsonResponse({"message": "Payment successful!"})
-        return JsonResponse(
-            {"message": "Payment not completed."}, status=400
-        )
+        return JsonResponse({"message": "Payment not completed."}, status=400)
+
 
 @extend_schema_view(
     get=extend_schema(
@@ -89,7 +95,7 @@ class PaymentSuccessView(APIView):
                 description="Payment can be completed within 24 hours."
             )
         },
-        description="Notify user that payment can be completed within 24 hours."
+        description="Notify user that payment can be completed within 24 hours.",
     )
 )
 class PaymentCancelView(APIView):
