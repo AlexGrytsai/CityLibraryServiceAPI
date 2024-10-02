@@ -11,7 +11,7 @@ from payment.models import PaymentModel
 class PaymentManager:
     FINE_MULTIPLIER = 2
 
-    def __init__(self, borrowing: Borrowing) -> None:
+    def __init__(self) -> None:
         stripe.api_key = settings.STRIPE_SECRET_KEY
 
     @staticmethod
