@@ -16,7 +16,7 @@ from borrowing.serializers import (
     BorrowingListSerializer,
     BorrowingDetailSerializer,
 )
-from payment.stripe_service import PaymentManager
+from payment.payment_service import PaymentManager
 
 logger = logging.getLogger("my_debug")
 
@@ -112,7 +112,9 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         book.inventory -= 1
         book.save()
 
-        serializer.save(user=self.request.user)
+        borrowing = serializer.save(user=self.request.user)
+
+        PaymentManager().create_payment(borrowing)
 
     @extend_schema(
         summary="Return a Book",
@@ -149,7 +151,8 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         borrowing.book.inventory += 1
         borrowing.book.save()
 
-        PaymentManager(borrowing)
+        if borrowing.actual_return_date > borrowing.expected_return_date:
+            PaymentManager().create_fine_payment(borrowing)
 
         logger.info(
             f"Book (id={borrowing.book.id}) returned "
