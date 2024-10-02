@@ -33,7 +33,7 @@ class PaymentManager:
                         "unit_amount": unit_amount,
                         "product_data": {
                             "name": f"Borrowing of {borrowing.book.title} "
-                                    f"(Borrowing ID: {borrowing.id})",
+                            f"(Borrowing ID: {borrowing.id})",
                             "description": describe_payment,
                         },
                     },
@@ -71,14 +71,15 @@ class PaymentManager:
         ).days
         daily_fee = borrowing.book.daily_fee
 
-        unit_amount = self.__calculate_money_to_pay_cents(
-            days_fine, daily_fee
-        ) * self.FINE_MULTIPLIER
+        unit_amount = (
+            self.__calculate_money_to_pay_cents(days_fine, daily_fee)
+            * self.FINE_MULTIPLIER
+        )
 
         stripe_session = self.__create_stripe_session(
             borrowing,
             unit_amount,
-            describe_payment="Fine payment for borrowing of book"
+            describe_payment="Fine payment for borrowing of book",
         )
 
         PaymentModel.objects.create(
