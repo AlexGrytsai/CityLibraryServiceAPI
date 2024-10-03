@@ -50,6 +50,17 @@ services:
     depends_on:
       - redis
 
+  beat:
+    build:
+      context: .
+    command: celery -A CityLibraryServiceAPI beat --loglevel=INFO
+    restart: on-failure
+    env_file:
+      - .env
+    depends_on:
+      - celery
+      - redis
+
 volumes:
   redis_data:
   library_data:
