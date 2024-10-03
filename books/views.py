@@ -1,6 +1,6 @@
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import viewsets
-from rest_framework.permissions import IsAdminUser, AllowAny
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 
 from books.models import Book
 from books.serializers import (
@@ -63,7 +63,9 @@ class BookViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method in ["POST", "PUT", "PATCH", "DELETE"]:
             return (IsAdminUser(),)
-        return (AllowAny(),)
+        if self.action == "list":
+            return (AllowAny(),)
+        return (IsAuthenticated(),)
 
     def get_serializer_class(self):
         if self.action == "list":

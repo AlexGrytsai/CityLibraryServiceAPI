@@ -15,6 +15,10 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
+
+from loggi import redis_logging
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "default_secret_key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,8 +51,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "debug_toolbar",
     "rest_framework",
+    "logging",
     "users",
     "books",
+    "borrowing",
+    "payment",
     "drf_spectacular",
 ]
 
@@ -86,7 +93,7 @@ WSGI_APPLICATION = "CityLibraryServiceAPI.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-POSTGRESQL_DB = False
+POSTGRESQL_DB = os.environ.get("POSTGRES_DB", True) == "True"
 
 if POSTGRESQL_DB:
     DATABASES = {
@@ -197,13 +204,23 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "custom": {
-            "()": "CityLibraryServiceAPI.log_formatters.CustomFormatter",
+            "()": "loggi.log_formatters.CustomFormatter",
             "format": "{levelname} [{asctime}] ({folder_name}/{filename}) {message}",
+            "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+        "info": {
+            "format": "{levelname} [{asctime}] ({filename}) {message}",
             "style": "{",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
     "handlers": {
+        "redis": {
+            "level": "INFO",
+            "class": "loggi.redis_logging.RedisLogHandler",
+            "formatter": "custom",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -220,19 +237,50 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "custom",
         },
+        "my_debug": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "my_debug.log",
+            "formatter": "info",
+        },
     },
     "loggers": {
         "django": {
-            "handlers": ["file", "console"],
+            "handlers": ["file", "console", "redis"],
             "level": "INFO",
             "propagate": True,
         },
         "security_checking": {
-            "handlers": ["security_console", "file"],
+            "handlers": ["security_console", "file", "redis"],
             "level": "INFO",
+            "propagate": True,
+        },
+        "my_debug": {
+            "handlers": ["my_debug"],
+            "level": "DEBUG",
             "propagate": True,
         },
     },
 }
 
 AUTH_USER_MODEL = "users.User"
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Europe/Kiev"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_BEAT_SCHEDULE = {
+    "check-overdue-borrowings-every-day": {
+        "task": "notification.tasks.notify_overdue_borrowings",
+        "schedule": crontab(hour="8", minute="0"),
+    },
+}
+
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_SUCCESS_URL = "http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}"
+STRIPE_CANCEL_URL = "http://localhost:8000/cancel"

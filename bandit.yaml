@@ -2,8 +2,11 @@
 exclude_dirs: [
   '.\books\tests\',
   '.\books\migrations\',
+  '.\borrowing\migrations\',
+  '.\borrowing\tests\',
   '.\users\tests\',
   '.\users\migrations\',
   '.\.venv\Lib\',
   '.\security_checking.py',
+  '.\generator_fake_data_for_db.py',
 ]

@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -13,7 +15,7 @@ class BookViewSetTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.admin = get_user_model().objects.create_user(
-            email="test333@example.com", password="testpassword", is_staff=True
+            email="admin@example.com", password="testpassword", is_staff=True
         )
         self.user = get_user_model().objects.create_user(
             email="test@example",
@@ -26,6 +28,8 @@ class BookViewSetTestCase(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_get_book_list(self):
         response = self.client.get(reverse("books:book-list"))
@@ -34,6 +38,19 @@ class BookViewSetTestCase(TestCase):
         self.assertEqual(response.data["results"][0]["title"], "Test Book")
 
     def test_get_book_detail(self):
+        response = self.client.get(
+            reverse("books:book-detail", kwargs={"pk": self.book.pk})
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(
+            reverse("books:book-detail", kwargs={"pk": self.book.pk})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["title"], "Test Book")
+
+        self.client.force_authenticate(user=self.admin)
         response = self.client.get(
             reverse("books:book-detail", kwargs={"pk": self.book.pk})
         )

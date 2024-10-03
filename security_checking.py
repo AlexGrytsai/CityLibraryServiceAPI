@@ -1,3 +1,4 @@
+
 import logging
 import os
 import subprocess
@@ -31,15 +32,10 @@ def run_bandit() -> None:
         f"bandit_report.{format_output}",
     ]
 
+    logger.info("Running bandit scan...")
     try:
-        logger.info("Running bandit scan...")
-        result = subprocess.run(
-            command,
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        with open("report_safety.html", "w") as f:
+            subprocess.run(command, stdout=f, stderr=subprocess.STDOUT)
         logger.info(
             "Bandit scan completed successfully. "
             "Report saved to 'report_bandit.{format_output}'."
@@ -49,8 +45,11 @@ def run_bandit() -> None:
 
 
 def run_safety_check() -> None:
-    # safety --stage production scan --key=<API_KEY> --output html --save-html output.html
-    api_key = os.environ.get("SAFETY_API_KEY")
+    """
+    safety --stage production scan --key=<API_KEY> --output html
+    --save-html output.html
+    """
+    api_key = os.environ.get("SAFETY_API_KEY", "")
     command = [
         "safety",
         "--stage",

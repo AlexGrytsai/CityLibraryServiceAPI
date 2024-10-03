@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -8,6 +10,8 @@ from rest_framework.test import APIClient
 class UserCreateViewTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+        logger = logging.getLogger("django")
+        logger.handlers = [h for h in logger.handlers if h.name != "redis"]
 
     def test_post_request(self):
         data = {
@@ -92,8 +96,7 @@ class UserPasswordUpdateViewTestCase(TestCase):
         data = {
             "password": "new!!!32password",
         }
-        response = self.client.put(reverse("users:password"), data=data)
-        print(response.data)
+        response = self.client.put(reverse("users:update-password"), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             get_user_model()
