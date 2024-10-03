@@ -105,6 +105,15 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         book = serializer.validated_data["book"]
         user = self.request.user
 
+        not_payment_borrowings = BorrowingModel.objects.filter(
+            user=user, payments__status="PENDING"
+        )
+
+        if not_payment_borrowings.exists():
+            raise serializers.ValidationError(
+                {"message": "You have an unpaid borrowing"}
+            )
+
         if book.inventory == 0:
             raise serializers.ValidationError(
                 {f"{book.title}": "The book is not available"}
