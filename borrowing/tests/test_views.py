@@ -140,7 +140,9 @@ class TestBorrowingView(TestCase):
 
     @patch("payment.payment_service.PaymentManager.create_payment")
     @patch("borrowing.serializers.notify_new_borrowing")
-    def test_perform_create_success(self, mock_notify_new_borrowing, mock_payment):
+    def test_perform_create_success(
+        self, mock_notify_new_borrowing, mock_payment
+    ):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
