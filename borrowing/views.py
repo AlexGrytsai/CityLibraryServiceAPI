@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.serializers import Serializer
 
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
@@ -45,7 +45,7 @@ logger = logging.getLogger("my_debug")
 )
 class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
-    queryset = Borrowing.objects.all().select_related("user", "book")
+    queryset = BorrowingModel.objects.all().select_related("user", "book")
 
     def get_queryset(self):
         queryset = super(BorrowingView, self).get_queryset()
@@ -103,6 +103,7 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
 
     def perform_create(self, serializer) -> None:
         book = serializer.validated_data["book"]
+        user = self.request.user
 
         if book.inventory == 0:
             raise serializers.ValidationError(
@@ -112,7 +113,7 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         book.inventory -= 1
         book.save()
 
-        borrowing = serializer.save(user=self.request.user)
+        borrowing = serializer.save(user=user)
 
         PaymentManager().create_payment(borrowing)
 

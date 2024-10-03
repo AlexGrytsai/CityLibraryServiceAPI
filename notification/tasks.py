@@ -6,7 +6,7 @@ from celery import shared_task
 from dateutil.utils import today
 from dotenv import load_dotenv
 
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 from notification.telegram import TelegramNotification
 
 load_dotenv()
@@ -27,7 +27,7 @@ def notify_new_borrowing(borrowing_details: str) -> None:
 @shared_task
 def notify_overdue_borrowings() -> None:
     tomorrow_date = today() + timedelta(days=1)
-    overdue_borrowings = Borrowing.objects.filter(
+    overdue_borrowings = BorrowingModel.objects.filter(
         actual_return_date=None, expected_return_date__lt=tomorrow_date
     )
     if not overdue_borrowings:

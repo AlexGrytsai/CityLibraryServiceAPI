@@ -4,7 +4,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from books.models import Book
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 from notification.tasks import notify_new_borrowing
 from payment.models import PaymentModel
 
@@ -17,13 +17,13 @@ class BorrowingSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = Borrowing
+        model = BorrowingModel
         fields = [
             "expected_return_date",
             "book",
         ]
 
-    def create(self, validated_data: dict) -> Borrowing:
+    def create(self, validated_data: dict) -> BorrowingModel:
         logger.info(f"User borrowed book '{validated_data['book']}'")
 
         user = validated_data["user"]
@@ -34,7 +34,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
         notify_new_borrowing(message)
 
-        return Borrowing.objects.create(**validated_data)
+        return BorrowingModel.objects.create(**validated_data)
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -48,7 +48,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True, source="payment_set")
 
     class Meta:
-        model = Borrowing
+        model = BorrowingModel
         fields = [
             "id",
             "book",
@@ -58,7 +58,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
             "payments",
         ]
 
-    def get_book(self, obj: Borrowing) -> str:
+    def get_book(self, obj: BorrowingModel) -> str:
         return obj.book.title
 
 
@@ -73,7 +73,7 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
     payments = PaymentSerializer(many=True, source="payment_set")
 
     class Meta:
-        model = Borrowing
+        model = BorrowingModel
         fields = [
             "id",
             "book",

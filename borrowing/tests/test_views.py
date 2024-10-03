@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from books.models import Book
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
@@ -38,10 +38,10 @@ class TestBorrowingView(TestCase):
             inventory=10,
             daily_fee=5.99,
         )
-        self.borrowing1 = Borrowing.objects.create(
+        self.borrowing1 = BorrowingModel.objects.create(
             user=self.admin, book=self.book, expected_return_date=future_date
         )
-        self.borrowing2 = Borrowing.objects.create(
+        self.borrowing2 = BorrowingModel.objects.create(
             user=self.regular_user,
             book=self.book,
             expected_return_date=future_date,

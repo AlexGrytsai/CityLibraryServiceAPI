@@ -6,7 +6,7 @@ from books.models import Book
 from users.models import User
 
 
-class Borrowing(models.Model):
+class BorrowingModel(models.Model):
     borrow_date = models.DateField(
         auto_now_add=True,
         db_comment="Borrowing date of the book",
@@ -37,7 +37,7 @@ class Borrowing(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         if self.pk is not None:
-            old_instance = get_object_or_404(Borrowing, pk=self.pk)
+            old_instance = get_object_or_404(BorrowingModel, pk=self.pk)
             if (
                 old_instance.actual_return_date
                 and old_instance.actual_return_date != self.actual_return_date

@@ -4,7 +4,7 @@ import stripe
 from django.conf import settings
 from stripe.checkout import Session
 
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 from payment.models import PaymentModel
 
 
@@ -20,7 +20,7 @@ class PaymentManager:
 
     @staticmethod
     def __create_stripe_session(
-        borrowing: Borrowing,
+        borrowing: BorrowingModel,
         unit_amount: int,
         describe_payment: str = "Payment for borrowing of book",
     ) -> Session:
@@ -46,7 +46,7 @@ class PaymentManager:
         )
         return session
 
-    def create_payment(self, borrowing: Borrowing) -> None:
+    def create_payment(self, borrowing: BorrowingModel) -> None:
         days_borrowed = (
             borrowing.expected_return_date - borrowing.borrow_date
         ).days
@@ -65,7 +65,7 @@ class PaymentManager:
             type=PaymentModel.Type.PAYMENT,
         )
 
-    def create_fine_payment(self, borrowing: Borrowing) -> None:
+    def create_fine_payment(self, borrowing: BorrowingModel) -> None:
         days_fine = (
             borrowing.actual_return_date - borrowing.expected_return_date
         ).days

@@ -1,6 +1,6 @@
 from django.db import models
 
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 
 
 class PaymentModel(models.Model):
@@ -18,7 +18,7 @@ class PaymentModel(models.Model):
     type = models.CharField(
         max_length=10, choices=Type.choices, default=Type.PAYMENT
     )
-    borrow = models.ForeignKey(Borrowing, on_delete=models.CASCADE)
+    borrow = models.ForeignKey(BorrowingModel, on_delete=models.CASCADE)
     session_url = models.URLField()
     session_id = models.CharField(max_length=255)
     money_to_pay = models.DecimalField(max_digits=10, decimal_places=2)

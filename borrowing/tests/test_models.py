@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from books.models import Book
-from borrowing.models import Borrowing
+from borrowing.models import BorrowingModel
 
 
 class TestBorrowingModel(TestCase):
@@ -29,7 +29,7 @@ class TestBorrowingModel(TestCase):
     @patch("borrowing.serializers.notify_new_borrowing")
     def test_borrowing_str_representation(self, mock_notify_new_borrowing):
         future_date = date.today() + timedelta(days=7)
-        borrowing = Borrowing.objects.create(
+        borrowing = BorrowingModel.objects.create(
             user=self.user, book=self.book, expected_return_date=future_date
         )
         self.assertEqual(
@@ -38,7 +38,7 @@ class TestBorrowingModel(TestCase):
 
     def test_borrowing_creation_fails_with_invalid_dates(self):
         with self.assertRaises(IntegrityError):
-            Borrowing.objects.create(
+            BorrowingModel.objects.create(
                 user=self.user,
                 book=self.book,
                 expected_return_date="2022-12-31",
@@ -47,11 +47,11 @@ class TestBorrowingModel(TestCase):
     def test_borrowing_creation_fails_with_non_unique_combination(self):
         future_date = date.today() + timedelta(days=7)
 
-        Borrowing.objects.create(
+        BorrowingModel.objects.create(
             user=self.user, book=self.book, expected_return_date=future_date
         )
         with self.assertRaises(IntegrityError):
-            Borrowing.objects.create(
+            BorrowingModel.objects.create(
                 user=self.user,
                 book=self.book,
                 expected_return_date=future_date,
@@ -59,7 +59,7 @@ class TestBorrowingModel(TestCase):
 
     def test_borrowing_save_fails_when_modifying_actual_return_date(self):
         future_date = date.today() + timedelta(days=7)
-        borrowing = Borrowing.objects.create(
+        borrowing = BorrowingModel.objects.create(
             user=self.user,
             book=self.book,
             expected_return_date=future_date,
