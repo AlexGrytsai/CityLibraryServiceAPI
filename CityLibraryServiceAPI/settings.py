@@ -93,7 +93,7 @@ WSGI_APPLICATION = "CityLibraryServiceAPI.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-POSTGRESQL_DB = True
+POSTGRESQL_DB = os.environ.get("POSTGRES_DB", True) == "True"
 
 if POSTGRESQL_DB:
     DATABASES = {

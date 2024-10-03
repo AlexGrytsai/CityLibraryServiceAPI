@@ -28,4 +28,4 @@ jobs:
       run: flake8 .
 
     - name: Run tests
-      run: python manage.py test
+      run: POSTGRESQL_DB=False python manage.py test
