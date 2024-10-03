@@ -6,6 +6,7 @@ from rest_framework import serializers
 from books.models import Book
 from borrowing.models import Borrowing
 from notification.tasks import notify_new_borrowing
+from payment.models import PaymentModel
 
 logger = logging.getLogger("my_debug")
 
@@ -36,8 +37,15 @@ class BorrowingSerializer(serializers.ModelSerializer):
         return Borrowing.objects.create(**validated_data)
 
 
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentModel
+        fields = ["id", "status", "money_to_pay"]
+
+
 class BorrowingListSerializer(serializers.ModelSerializer):
     book = serializers.SerializerMethodField()
+    payments = PaymentSerializer(many=True, source="payment_set")
 
     class Meta:
         model = Borrowing
@@ -47,6 +55,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
+            "payments",
         ]
 
     def get_book(self, obj: Borrowing) -> str:
@@ -61,6 +70,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
 
 class BorrowingDetailSerializer(serializers.ModelSerializer):
     book = BookDetailSerializer()
+    payments = PaymentSerializer(many=True, source="payment_set")
 
     class Meta:
         model = Borrowing
@@ -70,4 +80,5 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
+            "payments",
         ]
