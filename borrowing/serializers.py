@@ -45,7 +45,7 @@ class PaymentSerializer(serializers.ModelSerializer):
 
 class BorrowingListSerializer(serializers.ModelSerializer):
     book = serializers.SerializerMethodField()
-    payments = PaymentSerializer(many=True, source="payment_set")
+    payments = PaymentSerializer(many=True)
 
     class Meta:
         model = BorrowingModel
@@ -70,7 +70,7 @@ class BookDetailSerializer(serializers.ModelSerializer):
 
 class BorrowingDetailSerializer(serializers.ModelSerializer):
     book = BookDetailSerializer()
-    payments = PaymentSerializer(many=True, source="payment_set")
+    payments = PaymentSerializer(many=True)
 
     class Meta:
         model = BorrowingModel

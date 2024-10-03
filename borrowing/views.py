@@ -45,7 +45,9 @@ logger = logging.getLogger("my_debug")
 )
 class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAuthenticated,)
-    queryset = BorrowingModel.objects.all().select_related("user", "book")
+    queryset = BorrowingModel.objects.all().select_related(
+        "user", "book"
+    ).prefetch_related("payments")
 
     def get_queryset(self):
         queryset = super(BorrowingView, self).get_queryset()
@@ -53,6 +55,9 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
 
         user_id = self.request.query_params.get("user_id")
         is_active = self.request.query_params.get("is_active")
+
+        if not current_user.is_staff:
+            queryset = queryset.filter(user=current_user)
 
         if user_id:
             if current_user.is_staff:
