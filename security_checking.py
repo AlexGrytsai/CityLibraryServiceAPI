@@ -49,7 +49,7 @@ def run_safety_check() -> None:
     safety --stage production scan --key=<API_KEY> --output html
     --save-html output.html
     """
-    api_key = os.environ.get("SAFETY_API_KEY")
+    api_key = os.environ.get("SAFETY_API_KEY", "")
     command = [
         "safety",
         "--stage",
@@ -76,4 +76,4 @@ def run_safety_check() -> None:
 
 if __name__ == "__main__":
     run_bandit()
-    # run_safety_check()
+    run_safety_check()
