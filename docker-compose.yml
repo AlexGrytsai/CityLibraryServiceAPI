@@ -14,8 +14,18 @@ services:
             python manage.py runserver 0.0.0.0:8000"
     restart: on-failure
     depends_on:
+      - db
       - redis
 
+  db:
+    image: postgres:16.3-alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - library_data:$PGDATA
 
   redis:
     image: redis:alpine
@@ -28,8 +38,7 @@ services:
       - $REDISDATA
       - redis_data:/data
     command:
-      - redis-server
-      - /usr/local/etc/redis/redis_logs.conf
+      - redis-server /usr/local/etc/redis/redis_logs.conf
 
 #  celery:
 #    build:
@@ -56,3 +65,4 @@ services:
 
 volumes:
   redis_data:
+  library_data:
