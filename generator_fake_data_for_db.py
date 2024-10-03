@@ -150,17 +150,17 @@ def generate_fake_payment_data(borrowing_data: list, book_data: list) -> list:
         money_payment = round(money_payment, 2)
 
         payment = {
-                "model": "payment.paymentmodel",
-                "pk": pk,
-                "fields": {
-                    "status": "PAID",
-                    "type": "PAYMENT",
-                    "borrow": borrowing_id,
-                    "session_url": fake.url(),
-                    "session_id": fake.uuid4(),
-                    "money_to_pay": str(money_payment),
-                },
-            }
+            "model": "payment.paymentmodel",
+            "pk": pk,
+            "fields": {
+                "status": "PAID",
+                "type": "PAYMENT",
+                "borrow": borrowing_id,
+                "session_url": fake.url(),
+                "session_id": fake.uuid4(),
+                "money_to_pay": str(money_payment),
+            },
+        }
         payment_data.append(payment)
         pk += 1
     return payment_data
