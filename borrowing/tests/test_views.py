@@ -138,8 +138,11 @@ class TestBorrowingView(TestCase):
             view.get_serializer_class(), BorrowingDetailSerializer
         )
 
+    @patch("payment.payment_service.PaymentManager.create_payment")
     @patch("borrowing.serializers.notify_new_borrowing")
-    def test_perform_create_success(self, mock_notify_new_borrowing):
+    def test_perform_create_success(
+        self, mock_notify_new_borrowing, mock_payment
+    ):
         test_book = Book.objects.create(
             title="Test Book 2",
             author="John Doe",
@@ -153,12 +156,17 @@ class TestBorrowingView(TestCase):
             "expected_return_date": date.today() + timedelta(days=14),
         }
 
-        response = self.client.post(
-            reverse("borrowing:borrowing-list"), data=data
-        )
+        response = self.client.post(reverse("borrowing:borrowing-list"),
+                                    data=data)
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
         test_book.refresh_from_db()
         self.assertEqual(test_book.inventory, 1)
+
+        mock_notify_new_borrowing.assert_called_once()
+
+        mock_payment.assert_called_once()
 
     @patch("borrowing.serializers.notify_new_borrowing")
     def test_perform_create_book_not_available(

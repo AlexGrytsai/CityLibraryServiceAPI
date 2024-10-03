@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "users",
     "books",
     "borrowing",
+    "payment",
     "drf_spectacular",
 ]
 
@@ -216,7 +217,7 @@ LOGGING = {
     },
     "handlers": {
         "redis": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "loggi.redis_logging.RedisLogHandler",
             "formatter": "custom",
         },
@@ -278,3 +279,8 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(hour="8", minute="0"),
     },
 }
+
+STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
+STRIPE_SUCCESS_URL = "http://localhost:8000/success?session_id={CHECKOUT_SESSION_ID}"
+STRIPE_CANCEL_URL = "http://localhost:8000/cancel"

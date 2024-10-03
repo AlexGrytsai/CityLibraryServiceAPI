@@ -16,6 +16,7 @@ from borrowing.serializers import (
     BorrowingListSerializer,
     BorrowingDetailSerializer,
 )
+from payment.payment_service import PaymentManager
 
 logger = logging.getLogger("my_debug")
 
@@ -25,7 +26,7 @@ logger = logging.getLogger("my_debug")
         summary="List Borrowings",
         tags=["Borrowings"],
         description="Retrieve a list of borrowings, "
-                    "optionally filtered by user ID or active status.",
+        "optionally filtered by user ID or active status.",
         responses={200: BorrowingListSerializer(many=True)},
     ),
     retrieve=extend_schema(
@@ -111,7 +112,9 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         book.inventory -= 1
         book.save()
 
-        serializer.save(user=self.request.user)
+        borrowing = serializer.save(user=self.request.user)
+
+        PaymentManager().create_payment(borrowing)
 
     @extend_schema(
         summary="Return a Book",
@@ -148,6 +151,12 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
         borrowing.book.inventory += 1
         borrowing.book.save()
 
+        if (
+            borrowing.actual_return_date.date()
+            > borrowing.expected_return_date
+        ):
+            PaymentManager().create_fine_payment(borrowing)
+
         logger.info(
             f"Book (id={borrowing.book.id}) returned "
             f"by user id={borrowing.user.id}. "
@@ -159,6 +168,6 @@ class BorrowingView(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
             data={
                 "message": f"Book {borrowing.book.title} "
-                           f"(id={borrowing.book.id}) returned"
+                f"(id={borrowing.book.id}) returned"
             },
         )

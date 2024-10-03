@@ -11,7 +11,7 @@ logger = logging.getLogger("my_debug")
 
 class TelegramNotification:
     def __init__(self) -> None:
-        telegram_token = os.getenv("TELEGRAM_TOKEN")
+        telegram_token = os.getenv("TELEGRAM_TOKEN", "token")
         if not telegram_token:
             logger.error("TELEGRAM_TOKEN is not set")
             raise ValueError("TELEGRAM_TOKEN is not set in the environment")
